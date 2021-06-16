@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,15 +27,21 @@ public class ListFiles extends AppCompatActivity{
     }
 
     public void listFiles(){
+        String path = getIntent().getStringExtra("PATH");
+
         executor.execute(() -> {
-            for (int i = 1; i <= 5; i++) {
+            SocketHandler.sendString(path);
+            List<String> folders = SocketHandler.receiveFolders();
+
+            for (int i = 0; i < folders.size(); i++) {
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
                 Button btn = new Button(this);
                 btn.setId(i);
                 final int id_ = btn.getId();
-                btn.setText("button " + id_);
+
+                btn.setText(folders.get(i));
 
                 LinearLayout linear = ((LinearLayout) findViewById(R.id.linear));
                 linear.addView(btn);
