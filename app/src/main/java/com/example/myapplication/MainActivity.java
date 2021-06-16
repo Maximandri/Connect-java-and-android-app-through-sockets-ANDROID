@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
 
-    private EditText e1;
+    private EditText e1, e2;
     private Socket socket = null;
 
     private static int cores = Runtime.getRuntime().availableProcessors();
@@ -27,6 +27,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         e1 = (EditText)findViewById(R.id.EditText01);
+        e2 = (EditText)findViewById(R.id.EditText02);
     }
 
     public void connect(View v){
@@ -34,23 +35,49 @@ public class MainActivity extends Activity {
         executor.execute(() -> {
             try {
                 String host = e1.getText().toString();
-                socket = new Socket(host, 6000);
+                String path = e2.getText().toString();
+                socket = new Socket("192.168.1.14", 6000);
 
                 SocketHandler socketHandler = new SocketHandler();
                 socketHandler.setSocket(socket);
+
+                Intent intent = new Intent(this, ListFiles.class);
+                intent.putExtra("PATH", path);
+                startActivity(intent);
             } catch (UnknownHostException e) {
-                Toast.makeText(this, "Can´t recognize the host", Toast.LENGTH_SHORT).show();
+                new Thread()
+                {
+                    public void run()
+                    {
+                        MainActivity.this.runOnUiThread(new Runnable()
+                        {
+                            public void run()
+                            {
+                                Toast.makeText(MainActivity.this, "Can´t recognize the host", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                }.start();
                 e.printStackTrace();
             } catch (ConnectException e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                new Thread()
+                {
+                    public void run()
+                    {
+                        MainActivity.this.runOnUiThread(() -> Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show());
+                    }
+                }.start();
                 e.printStackTrace();
             } catch (IOException e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                new Thread()
+                {
+                    public void run()
+                    {
+                        MainActivity.this.runOnUiThread(() -> Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show());
+                    }
+                }.start();
                 e.printStackTrace();
             }
-
-            Intent intent = new Intent(this, ListFiles.class);
-            startActivity(intent);
         });
 
 
