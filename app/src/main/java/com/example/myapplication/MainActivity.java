@@ -36,7 +36,7 @@ public class MainActivity extends Activity {
             try {
                 String host = e1.getText().toString();
                 String path = e2.getText().toString();
-                socket = new Socket("192.168.1.14", 6000);
+                socket = new Socket(host, 6000);
 
                 SocketHandler socketHandler = new SocketHandler();
                 socketHandler.setSocket(socket);
